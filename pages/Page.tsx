@@ -17,6 +17,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { ChangeEvent, useState } from 'react';
 import moment from 'moment';
+import InfoModal from './components/InfoModal';
 
 interface IUser {
   name: string;
@@ -26,7 +27,11 @@ interface IUser {
   sex: string;
 }
 
-export default function Home() {
+export const validateEmail = (str = '') => str.includes('@');
+
+export default function Page() {
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [error, setError] = useState<string>('');
   const [user, setUser] = useState<IUser>({
     name: 'John',
     email: 'example@bus.co',
@@ -34,6 +39,10 @@ export default function Home() {
     role: 'free',
     sex: 'female',
   });
+
+  const toggleOpenModal = () => {
+    setOpenModal((prev) => !prev);
+  };
 
   const handleChangeDate = (newValue: any) => {
     const date = moment(newValue).format('LL');
@@ -50,7 +59,14 @@ export default function Home() {
 
   const handleSubmit = (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    console.log('SUBMIT!', user);
+    if (!validateEmail(user.email)) {
+      setError('Field is not valid');
+      setOpenModal(true);
+    } else {
+      setError('');
+      setOpenModal(true);
+      console.log('SUBMIT!', user);
+    }
   };
 
   return (
@@ -117,11 +133,12 @@ export default function Home() {
               name="email"
               onChange={handleChangeValue}
             />
-            <Button type="submit" variant="contained" color="primary">
+            <Button type="submit" variant="contained" color="primary" role="button">
               SUBMIT
             </Button>
           </FormControl>
         </Box>
+        <InfoModal open={openModal} toggleOpen={toggleOpenModal} isError={!!error} />
       </main>
     </>
   );
